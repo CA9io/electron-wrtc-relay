@@ -1,6 +1,6 @@
 import {App} from "electron"
 import Daemon from "./src/daemon"
-var EventEmitter = require('events').EventEmitter
+import EventEmitter from "events";
 
 // hand over app
 module.exports = function (opts: {app: App}) {

@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/CA9io/electron-wrtc-relay#readme",
   "dependencies": {
-    "electron": "^19.0.5"
+    "electron": "^19.0.5",
+    "ndjson": "^2.0.0"
   }
 }
