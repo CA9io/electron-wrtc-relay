@@ -1,122 +1,125 @@
 import {App, BrowserWindow, ipcMain} from "electron";
 import EventEmitter from "events";
-import path from "path";
+import Relay from "./relay";
 import json from "ndjson"
 
 export default class Daemon extends EventEmitter{
     private relay: Relay = null
-    constructor(opts: {app: App}) {
+    private timeout : number = 10000
+    private queue : any[] = []
+    private ready : boolean = false;
+    private closing : boolean = false;
+    private i : number = 0;
+    private child = null
+    private keepaliveInterval
+    private opts : any = {}
+    constructor(opts: {app: App, timeout?: number, nodeIPC?: boolean}) {
         super()
         if(typeof opts?.app === "undefined") return;
         this.relay = new Relay(opts.app)
-    }
-}
-
-class Relay{
-    private app : App = null
-    private window: BrowserWindow = null
-    private options: any
-    private timeout
-
-    constructor(app : App) {
-        this.app = app;
-        this.init()
+        if(typeof opts.timeout === "number") this.timeout = opts.timeout;
+        if (opts.nodeIPC == null && process.platform !== 'linux') {
+            opts.nodeIPC = true
+        }
+        this.opts = opts
+        this._startElectron(opts)
     }
 
-    private init(){
-        if (typeof process.send !== 'function') {
-            var stdin = json.parse()
-            process.stdin.pipe(stdin)
-
-            var stdout = json.serialize()
-            stdout.pipe(process.stdout)
-
-            //@ts-ignore TODO: add correct types
-            process.send = function (data) {
-                stdout.write(data)
+    eval(code, opts:any = {}, cb){
+        if (typeof opts === 'function') {
+            cb = opts
+            opts = {}
+        }
+        var id = (this.i++).toString(36)
+        this.once(id, (res) => {
+            let err = null;
+            if (res.err) {
+                let target = opts.mainProcess ? 'main process' : 'window'
+                err = new Error(`Error evaluating "${code}" ` +
+                    `in "${target}": ${res.err}`)
+                err.original = res.err
             }
-            stdin.on('data', function (data) {
-                //@ts-ignore TODO: add correct types
-                process.emit('message', data)
+            if (cb) {
+                if (err) return cb(err)
+                return cb(null, res.res)
+            }
+            if (err) this.emit('error', err)
+        })
+        if (!this.ready) return this.queue.push([ code, opts, cb ])
+        this.child.send({ id, opts, code })
+    }
+    keepalive(){
+        this.child.send(0)
+    }
+    error(err){
+        this.emit('error', err)
+        this.close()
+    }
+    close(signal?){
+        if (this.closing) return
+        this.closing = true
+        if (this.child) {
+            this.child.kill(signal)
+        }
+        this.eval = (code, opts = {}, cb) => {
+            if (typeof opts === 'function') {
+                cb = opts
+                opts = {}
+            }
+            var error = new Error('Daemon already closed')
+            if (cb) {
+                return cb(error)
+            }
+            this.emit('error', error)
+        }
+        clearInterval(this.keepaliveInterval)
+    }
+    _startElectron(cb){
+        var env = {}
+        var exitStderr = ''
+        var electronOpts : any = { env }
+        if (this.opts.nodeIPC) electronOpts.stdio = [ 'ipc' ]
+        this.child = spawn(opts.electron || electron, [ opts.daemonMain ], electronOpts)
+        this.child.on('close', (code) => {
+            if (this.closing) return
+            var err = `electron-eval error: Electron process exited with code ${code}`
+            if (exitStderr) err += `.\nStderr:\n${exitStderr}`
+            this.error(new Error(err))
+        })
+        this.child.on('error', (err) => this.error(err))
+        this.child.stderr.on('data', (data) => {
+            exitStderr += `${data.toString()}${exitStderr ? '\n' : ''}`
+        })
+
+        process.on('exit', () => this.child.kill())
+
+        if (!opts.nodeIPC) this._startIPC()
+
+        this.child.once('message', (data) => {
+            this.keepaliveInterval = setInterval(this.keepalive.bind(this), opts.timeout / 2)
+            this.keepaliveInterval.unref()
+            this.child.send(opts)
+            this.child.once('message', (data) => {
+                this.child.on('message', (message) => this.emit(message[0], message[1]))
+                this.ready = true
+                this.queue.forEach((item) => this.eval(...item))
+                this.queue = null
+                this.emit('ready')
+                this.keepalive()
             })
-        }
-
-        process.once('message', this.main)
-        process.send('starting')
-    }
-
-    private main(opts: any){
-        this.options = opts;
-        this.resetTimeout()
-
-        ipcMain.on("data", (e, data) => {
-            process.send(data)
-        })
-
-        if(this.app.isReady()) this.createWindow()
-            else this.app.once("ready", () => {this.createWindow()})
-    }
-
-    private createWindow(){
-        //TODO: check webPreferences. Can we deactivate some features?
-        this.window = new BrowserWindow({
-            title: 'WRTC Relay',
-            height: 1,
-            width: 1,
-            backgroundColor: '#171b21',
-            show: false,
-            autoHideMenuBar: false,
-            transparent: true,
-            frame: false,
-            skipTaskbar: true,
-            webPreferences: {
-                nodeIntegration: true,
-                contextIsolation: false,
-                webSecurity: false,
-                nodeIntegrationInWorker: true,
-                nodeIntegrationInSubFrames: true,
-                devTools: process.env.NODE_ENV !== 'production',
-            },
-            icon: path.join(this.app.getAppPath(), 'public/icons/icon.png'),
-        });
-
-        //TODO: check path
-        this.window.loadURL(path.join("./src", "renderer", 'index.html'));
-
-        this.window.webContents.on("did-finish-load", () => {
-            process.on("message", this.onMessage);
-            process.send("ready");
-        })
-        this.window.once("close", () => {
-            //@ts-ignore TODO: check error
-            process.removeListener("message", this.onMessage)
-            this.window = null
         })
     }
+    _startIPC(){
+        var stdin = json.serialize()
+        stdin.on('error', (err) => this.error(err))
+        stdin.pipe(this.child.stdin)
 
-    private onMessage(message: { opts: { mainProcess: any; }; code: string; id: any; }){
-        this.resetTimeout()
-        if (typeof message !== 'object') return
-        if (message.opts.mainProcess) {
-            let res
-            let err
-            try {
-                //TODO: check if that can be somehow improved
-                res = eval(message.code) // eslint-disable-line
-            } catch (e) {
-                err = e.stack
-            }
-            process.send([ message.id, { res: res, err: err } ])
-        } else {
-            if (this.window) this.window.webContents.send('data', message)
-        }
-    }
+        var stdout = json.parse()
+        stdout.on('error', (err) => this.error(err))
+        this.child.stdout.pipe(stdout)
 
-    private resetTimeout(){
-        if(this.timeout) clearTimeout(this.timeout);
-        this.timeout = setTimeout(() => {
-            //TODO: check if this is correct in our usecase, just remove the window?
-            process.exit(2)
-        }, this.options.timeout)
+        this.child.send = (data) => stdin.write(data)
+        stdout.on('data', (data) => this.child.emit('message', data))
     }
 }
+
