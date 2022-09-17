@@ -1,32 +1,48 @@
 {
-  "name": "electron-wrtc-relay",
-  "version": "1.0.0",
-  "description": "WebRTC Relay for electron applications compatible with wrtc interface and simple peer",
+  "name": "@ca9io/electron-webrtc-relay",
+  "version": "0.0.4",
+  "description": "Use WebRTC in Electron Main Process, compatible with Webtorrent",
   "main": "index.js",
+  "browser": "browser.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "standard --fix && tap test/*.js -t150 -Rspec --cov",
+    "test-tap": "tap test/*.js -Rtap",
+    "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info",
+    "pub": "npm publish --access public ."
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/CA9io/electron-wrtc-relay.git"
+  "engines": {
+    "node": ">=12"
   },
   "keywords": [
     "webrtc",
-    "wrtc",
     "electron",
-    "node"
+    "relay",
+    "wrtc",
+    "webtorrent"
   ],
-  "author": "CA9.io (TM9657 GmbH)",
+  "author": "TM9657 GmbH <support@ca9.io>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/CA9io/electron-wrtc-relay/issues"
-  },
-  "homepage": "https://github.com/CA9io/electron-wrtc-relay#readme",
   "dependencies": {
-    "electron": "^19.0.5",
-    "ndjson": "^2.0.0"
+    "debug": "^2.2.0",
+    "get-browser-rtc": "^1.0.2",
+    "hat": "^0.0.3"
   },
   "devDependencies": {
-    "@types/node": "^18.0.0"
-  }
+    "simple-peer": "^6.0.1",
+    "electron": "^20.1.4",
+    "standard": "^10.0.0",
+    "string-to-stream": "^1.0.1",
+    "tap": "^5.1.1"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CA9io/electron-webrtc.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CA9io/electron-webrtc/issues"
+  },
+  "homepage": "https://github.com/CA9io/electron-webrtc#readme"
 }
