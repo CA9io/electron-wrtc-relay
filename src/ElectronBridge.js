@@ -3,9 +3,7 @@ const { BrowserWindow } = require("electron")
 const { ipcMain } = require('electron');
 const debugFactory = require('debug');
 const EventEmitter = require('events');
-debugFactory.enable(true)
 const debug = debugFactory('electron-webrtc-relay:Bridge')
-debug.enabled = true
 
 const loadView = (preload, debug) => {
   return (`
