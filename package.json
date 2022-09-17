@@ -39,10 +39,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CA9io/electron-webrtc.git"
+    "url": "git+https://github.com/CA9io/electron-wrtc-relay.git"
   },
   "bugs": {
-    "url": "https://github.com/CA9io/electron-webrtc/issues"
+    "url": "https://github.com/CA9io/electron-wrtc-relay/issues"
   },
-  "homepage": "https://github.com/CA9io/electron-webrtc#readme"
+  "homepage": "https://github.com/CA9io/electron-wrtc-relay#readme"
 }
