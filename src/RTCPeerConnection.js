@@ -66,7 +66,6 @@ module.exports = function (daemon, wrtc) {
             }
             var offer, answer
             function sendEvent () {
-              console.dir(offer)
               send(id, {
                 type: 'icecandidate',
                 event: event,
@@ -126,6 +125,8 @@ module.exports = function (daemon, wrtc) {
               signalingState: pc.signalingState
             })
           }
+          
+          invokeGC()
         })()
       `, (err) => {
         if (err) wrtc.emit('error', err, this)
@@ -261,6 +262,7 @@ module.exports = function (daemon, wrtc) {
     close () {
       this._eval(`
         if (pc.signalingState !== 'closed') pc.close()
+        pc = null
       `)
     }
 

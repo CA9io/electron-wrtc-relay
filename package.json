@@ -1,11 +1,12 @@
 {
   "name": "@ca9io/electron-webrtc-relay",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Use WebRTC in Electron Main Process, compatible with Webtorrent",
   "main": "index.js",
   "browser": "browser.js",
   "scripts": {
-    "test": "standard --fix && tap test/*.js -t150 -Rspec --cov",
+    "testfix": "standard --fix && tap test/*.js -t150 -Rspec --cov",
+    "test": "tap test/*.js -t150 -Rspec --cov",
     "test-tap": "tap test/*.js -Rtap",
     "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info",
     "pub": "npm publish --access public ."

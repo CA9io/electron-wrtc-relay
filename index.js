@@ -1,5 +1,5 @@
 var EventEmitter = require('events').EventEmitter
-const Bridge = require("./src/ElectronBridge")
+const Bridge = require('./src/ElectronBridge')
 
 module.exports = function (opts) {
   var bridge = new Bridge(opts)

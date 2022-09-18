@@ -1,10 +1,11 @@
+const app = require("electron").app
 var test = require('tap').test
 var Peer = require('simple-peer')
 var str = require('string-to-stream')
-
 var wrtc
 test('create daemon', (t) => {
-  wrtc = require('..')()
+  wrtc = require('..')({debug: true})
+  wrtc.init()
   wrtc.electronDaemon.once('ready', t.end)
 })
 

@@ -64,7 +64,7 @@ module.exports = function (bridge, wrtc) {
         }
         dc.id
       `, (err, id) => {
-        if (err) return this.emit('error', err)
+        if (err) return console.error(err) // this.emit('error', err)
         this.id = this.stream = id
         this._registerListeners()
         this.emit('init')
@@ -123,7 +123,7 @@ module.exports = function (bridge, wrtc) {
         }
         dc.msgQueue = null
       `, cb || ((err) => {
-        if (err) this.emit('error', err)
+        if (err) console.error(err) // this.emit('error', err)
       }))
     }
 
@@ -158,7 +158,7 @@ module.exports = function (bridge, wrtc) {
     close () {
       this.readyState = 'closing'
       this._eval('if (dc) dc.close()', (err) => {
-        if (err) this.emit('error', err)
+        if (err) console.error(err) //this.emit('error', err)
       })
     }
 
@@ -179,7 +179,7 @@ module.exports = function (bridge, wrtc) {
         }
         dc.bufferedAmount
       `, (err, bufferedAmount) => {
-        if (err) return this.emit('error', err)
+        if (err) return console.error(err) // this.emit('error', err)
         this.bufferedAmount = bufferedAmount
       })
     }
@@ -190,7 +190,7 @@ module.exports = function (bridge, wrtc) {
         var pc = conns[${JSON.stringify(this._pcId)}]
         var dc = pc.dataChannels[${JSON.stringify(this.id)}]
       ` + code, cb || ((err) => {
-        if (err) this.emit('error', err)
+        if (err) console.err(err)//this.emit('error', err)
       }))
     }
 
