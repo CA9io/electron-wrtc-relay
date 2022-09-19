@@ -32,7 +32,7 @@ const loadView = (preload, debug) => {
           }
           
           function handlersAtLimit(){
-            typeof conns === "object" && Object.keys(conns).length >= MAXMESSAGES
+            return typeof conns === "object" && Object.keys(conns).length >= MAXMESSAGES
           }
           
           function workMessage(message){
