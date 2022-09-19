@@ -1,15 +1,15 @@
 {
   "name": "@ca9io/electron-webrtc-relay",
-  "version": "0.0.9",
-  "description": "Use WebRTC in Electron Main Process, compatible with Webtorrent",
+  "version": "0.1.1",
+  "description": "Use WebRTC in Electron Main Process, compatible with WebTorrent",
   "main": "index.js",
-  "browser": "browser.js",
   "scripts": {
-    "testfix": "standard --fix && tap test/*.js -t150 -Rspec --cov",
+    "build": "tsc",
+    "testfix": "tap test/*.js -t150 -Rspec --cov",
     "test": "tap test/*.js -t150 -Rspec --cov",
     "test-tap": "tap test/*.js -Rtap",
     "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info",
-    "publish": "npm publish --access public ."
+    "publish": "tsc && npm publish --access public ."
   },
   "engines": {
     "node": ">=12"
@@ -24,16 +24,16 @@
   "author": "TM9657 GmbH <support@ca9.io>",
   "license": "MIT",
   "dependencies": {
-    "debug": "^2.2.0",
-    "get-browser-rtc": "^1.0.2",
-    "hat": "^0.0.3"
+    "debug": "^4.3.4",
+    "get-browser-rtc": "^1.1.0"
   },
   "devDependencies": {
-    "simple-peer": "^6.0.1",
+    "@types/debug": "^4.1.7",
     "electron": "^20.1.4",
-    "standard": "^10.0.0",
-    "string-to-stream": "^1.0.1",
-    "tap": "^5.1.1"
+    "simple-peer": "^9.11.1",
+    "string-to-stream": "^3.0.1",
+    "tap": "^16.3.0",
+    "typescript": "^4.8.3"
   },
   "directories": {
     "test": "test"

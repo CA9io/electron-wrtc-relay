@@ -2,7 +2,7 @@
 
 <p align="center">
 <a href="https://ca9.io" target="_blank">
-    <img width="150" height="150" src="https://cdn.ca9.io/branding/logo/windows11/Square150x150Logo.scale-100.png">
+    <img width="150" height="150" src="https://cdn.ca9.io/branding/logo/windows11/Square150x150Logo.scale-200.png">
 </a>
 </p>
 
@@ -27,7 +27,7 @@ useful to let Node.js programs use WebRTC, e.g. in [`webtorrent-hybrid`](https:/
 
 ## Status
 
-This module is compatible with [`simple-peer`](https://github.com/feross/simple-peer) and passes its tests.
+This module is compatible with [`simple-peer`](https://github.com/feross/simple-peer) and passes its tests [compatible but tests need an update ;)].
 
 `electron-webrtc-relay` is intended for use with RTCDataChannels, so the MediaStream API is not supported.
 
@@ -42,7 +42,7 @@ var wrtc = require("@ca9io/electron-webrtc-relay")({
   preload: string //(optional) absolute path to your preload script. Using secure context if active (TODO: add example implementation)
 });
 
-// WHEN YOUR APP IS LOADED CALL
+// IMPORTANT: WHEN YOUR APP IS LOADED CALL
 wrtc.init()
 
 // handle errors that may occur when trying to communicate with Electron
@@ -69,7 +69,7 @@ wrtc.on("error", function (err, source) {
 
 #### `var wrtc = require('@ca9io/electron-webrtc-relay')([opts])`
 
-Calling the function exported by this module will create a new hidden Electron process. It is recommended to only create one, since Electron uses a lot of resources.
+Calling the function exported by this module will create a new hidden Electron Window.
 
 An optional `opts` object may contain specific options.
 
@@ -77,9 +77,13 @@ The object returned by this function has the same API as the [`node-webrtc`](htt
 
 Any errors that occur when communicating with the Electron daemon will be emitted by the `wrtc` object (`wrtc.on('error', ...)`).
 
+#### `wrtc.init()`
+
+Tells the relay to start a Browser window. It is important that you call this once.
+
 #### `wrtc.close()`
 
-Closes the Electron process and releases its resources. You may not need to do this since the Electron process will close automatically after the Node process terminates.
+Frees some resources.
 
 ### Events
 

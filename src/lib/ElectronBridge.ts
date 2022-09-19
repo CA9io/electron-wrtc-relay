@@ -1,11 +1,19 @@
 'use strict'
-const { BrowserWindow } = require("electron")
+import { BrowserWindow } from "electron"
+import {OPTS} from "../index";
 const { ipcMain } = require('electron');
 const debugFactory = require('debug');
+
+// @ts-ignore
 const EventEmitter = require('events');
+// @ts-ignore
 const debug = debugFactory('electron-webrtc-relay:Bridge')
 
-const loadView = (preload, debug) => {
+interface RelayError extends Error {
+  original: string;
+}
+
+const loadView = (preload: boolean, debug: boolean) => {
   return (`
    <!DOCTYPE html>
     <html>
@@ -104,21 +112,21 @@ const loadView = (preload, debug) => {
 }
 
 module.exports = class Bridge extends EventEmitter {
-  BrowserWindow = null;
+  RelayWindow : BrowserWindow | undefined;
   i = 0
-  queue = []
+  queue : {id: string, code: string}[] = []
   ready = false
   closing = false
+  opts : OPTS = {debug: false}
 
-  opts = {}
-  constructor (opts) {
+  constructor (opts : OPTS) {
     super()
     if(typeof opts === "undefined") opts = {debug: false}
     this.opts = opts;
     if(opts.debug) debug.enabled = true;
   }
 
-  _debug(msg){
+  private _debug(msg : string){
     if(!this.opts.debug) return;
     debug(msg)
   }
@@ -126,7 +134,7 @@ module.exports = class Bridge extends EventEmitter {
   init(){
     this._debug(`Initializing Relay: ${JSON.stringify(this.opts)}`)
 
-    this.BrowserWindow = new BrowserWindow({
+    this.RelayWindow = new BrowserWindow({
       title: 'WRTC Relay',
       width: this.opts.debug ? 900 : 0,
       height: this.opts.debug ? 750 : 0,
@@ -145,13 +153,13 @@ module.exports = class Bridge extends EventEmitter {
       },
     });
 
-    if(this.opts.debug) this.BrowserWindow.webContents.openDevTools();
-    var file = 'data:text/html;charset=UTF-8,' + encodeURIComponent(loadView(typeof this.opts.preload === "string", this.opts.debug));
-    this.BrowserWindow.loadURL(
+    if(this.opts.debug) this.RelayWindow.webContents.openDevTools();
+    var file = 'data:text/html;charset=UTF-8,' + encodeURIComponent(loadView(typeof this.opts.preload === "string", typeof this.opts.debug !== "undefined" && this.opts.debug));
+    this.RelayWindow.loadURL(
       file
     );
 
-    this.BrowserWindow.once('ready-to-show', () => {
+    this.RelayWindow.once('ready-to-show', () => {
       this.ready = true;
       ipcMain.on("WRTCRelayData", (event, message) => {
         if (typeof message !== 'object') return
@@ -164,12 +172,12 @@ module.exports = class Bridge extends EventEmitter {
 
   _queue(){
     this.queue.forEach((obj) => {
-      this.BrowserWindow.webContents.send("WRTCRelayData", obj)
+      this.RelayWindow?.webContents.send("WRTCRelayData", obj)
     })
   }
 
-  eval(code, opts = {}, cb){
-    const inactive = this.BrowserWindow === null || !this.ready
+  eval(code : string, opts : any = {}, cb: (err: null | Error, res?: any) => void){
+    const inactive = this.RelayWindow === null || !this.ready
 
     if (typeof opts === 'function') {
       cb = opts
@@ -179,12 +187,11 @@ module.exports = class Bridge extends EventEmitter {
 
     const id = (this.i++).toString(36)
 
-    this.once(id, (res) => {
-      let err = null
+    this.once(id, (res : any) => {
+      let err : any = null
       if (res.err) {
-        const target = opts.mainProcess ? 'main process' : 'window'
         err = new Error(
-          `Error evaluating "${code}" ` + `in "${target}": ${res.err}`
+          `Error evaluating "${code}" ` + `${res.err}`
         )
         err.original = res.err
       }
@@ -200,7 +207,7 @@ module.exports = class Bridge extends EventEmitter {
       return;
     }
 
-    this.BrowserWindow.webContents.send("WRTCRelayData", { id, code })
+    this.RelayWindow?.webContents.send("WRTCRelayData", { id, code })
   }
 
   close(){

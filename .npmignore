@@ -1,2 +1,6 @@
 test
 coverage
+.idea
+src
+.nyc_output
+tsconfig.json
