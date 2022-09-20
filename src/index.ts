@@ -2,7 +2,7 @@ import {EventEmitter} from "events"
 
 const Bridge = require('./lib/ElectronBridge')
 
-export type OPTS = { debug?: boolean, preload?: string }
+export type OPTS = { debug?: boolean, preload?: string, webrtcPolicy?: "default" | "default_public_interface_only" | "default_public_and_private_interfaces" | "disable_non_proxied_udp" }
 
 export interface BRIDGE extends EventEmitter {
     init: () => void;

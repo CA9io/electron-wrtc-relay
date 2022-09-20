@@ -154,7 +154,8 @@ module.exports = class Bridge extends EventEmitter {
     });
 
     if(this.opts.debug) this.RelayWindow.webContents.openDevTools();
-    var file = 'data:text/html;charset=UTF-8,' + encodeURIComponent(loadView(typeof this.opts.preload === "string", typeof this.opts.debug !== "undefined" && this.opts.debug));
+    this.RelayWindow.webContents.setWebRTCIPHandlingPolicy(typeof this.opts.webrtcPolicy === "string"? this.opts.webrtcPolicy : "default")
+    const file = 'data:text/html;charset=UTF-8,' + encodeURIComponent(loadView(typeof this.opts.preload === "string", typeof this.opts.debug !== "undefined" && this.opts.debug));
     this.RelayWindow.loadURL(
       file
     );
