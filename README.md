@@ -40,7 +40,7 @@ This module is compatible with [`simple-peer`](https://github.com/feross/simple-
 var wrtc = require("@ca9io/electron-webrtc-relay")({
   debug: false, //(optional) defaults to false
   preload: string, //(optional) absolute path to your preload script. Using secure context if active (TODO: add example implementation)
-  webrtcPolicy:  "default" | "default_public_interface_only" | "default_public_and_private_interfaces" | "disable_non_proxied_udp" // (optional) default: "default". Read More: https://support.brave.com/hc/en-us/articles/360017989132-How-do-I-change-my-Privacy-Settings-#webrtc
+  webrtcPolicy:  "default" | "default_public_interface_only" | "default_public_and_private_interfaces" | "disable_non_proxied_udp" // (optional) default: "default". Read More: https://www.electronjs.org/docs/latest/api/web-contents#contentssetwebrtciphandlingpolicypolicy
 });
 
 // IMPORTANT: WHEN YOUR APP IS LOADED CALL
