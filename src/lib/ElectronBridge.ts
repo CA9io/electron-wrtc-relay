@@ -90,10 +90,10 @@ const loadView = (preload: boolean, debug: boolean) => {
           function workQueue(){
             if(queue.length === 0) return;
             if(handlersAtLimit()) return;
-            queueMicrotask(() => {
-              let message = queue.shift()
-              workMessage(message)
-            })
+            
+            // Fixed Queue Overflow
+            let message = queue.shift()
+            workMessage(message)
           }
           setInterval(workQueue, 50);
         

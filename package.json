@@ -1,6 +1,6 @@
 {
   "name": "@ca9io/electron-webrtc-relay",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Use WebRTC in Electron Main Process, compatible with WebTorrent",
   "main": "index.js",
   "scripts": {
