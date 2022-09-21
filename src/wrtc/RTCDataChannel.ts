@@ -5,26 +5,6 @@ import {EventEmitter} from "events";
 const debug = require('debug')('RTCDC')
 
 module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
-    bridge.eval(`
-    window.arrayBufferToBase64 = function (buffer) {
-      var binary = ''
-      var bytes = new Uint8Array(buffer)
-      for (var i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i])
-      }
-      return window.btoa(binary)
-    }
-
-    window.base64ToArrayBuffer = function (base64) {
-      var binary = window.atob(base64)
-      var bytes = new Uint8Array(binary.length)
-      for (var i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i)
-      }
-      return bytes.buffer
-    }
-  `)
-
     return class RTCDataChannel extends EventEmitter {
         private _pcId: any;
         private label: any;
@@ -68,7 +48,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
             this.negotiated = false
             this.reliable = typeof opts.reliable === 'boolean' ? opts.reliable : true
             this.on('error', (err: any) => wrtc.emit('error', err, this))
-            bridge.eval(`
+            bridge.eval(JSON.stringify(pcId),`
         var pc = conns[${JSON.stringify(pcId)}]
         var dc = pc.createDataChannel(
           ${JSON.stringify(label)}, ${JSON.stringify(opts)})
@@ -204,7 +184,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
 
         _eval(code: string, cb?: any) {
             if (typeof this._pcId === "undefined") return
-            return bridge.eval(`
+            return bridge.eval(JSON.stringify(this._pcId), `
         var pc = conns[${JSON.stringify(this._pcId)}]
         var dc = pc.dataChannels[${JSON.stringify(this.id)}]
       ` + code, cb || ((err: Error) => {

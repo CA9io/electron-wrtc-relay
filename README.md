@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+    <a href="https://www.npmjs.com/package/@ca9io/electron-webrtc-relay"><img src="https://img.shields.io/npm/dw/@ca9io/electron-webrtc-relay?logo=Npm"/> </a>
 	<a href="https://www.npmjs.com/package/@ca9io/electron-webrtc-relay"><img src="https://img.shields.io/npm/v/@ca9io/electron-webrtc-relay.svg?logo=Npm"></a>
 	<a href="https://discord.ca9.io"><img src="https://img.shields.io/discord/673169081704120334?label=discord&style=flat&color=5a66f6&logo=Discord"></a>
 	<a href="https://twitter.com/ca9_io"><img src="https://img.shields.io/badge/twitter-follow_us-1d9bf0.svg?style=flat&logo=Twitter"></a>
@@ -65,7 +66,11 @@ wrtc.on("error", function (err, source) {
   console.error(err);
 });
 ```
-
+### Configuration
+- `debug` - Enables output log and rendered Electron Window with devtools enabled
+- `preload` - You can link your custom preload script. Since Webpack will just remove our script we can not do that. You have to add the ipcRenderer Module to the window object in your script.
+- `webrtcPolicy` - Define how to handle WebRTC within your project. If default is active, local connections in your network are not possible (please verify this)
+- `maxWindows` - Chromium only allows for a certain amount of WebRTC connections per Window. With maxWindows you can allow the creation of more than one window to improve performance in performance heavy applications
 ### Methods
 
 #### `var wrtc = require('@ca9io/electron-webrtc-relay')([opts])`

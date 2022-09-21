@@ -9,9 +9,6 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
     const RTCDataChannel = require('./RTCDataChannel.js')(bridge, wrtc)
 
     let i = 0
-    bridge.eval('window.conns = {}', (err: Error) => {
-        if (err) wrtc.emit('error', err)
-    })
 
     return class RTCPeerConnection extends EventEmitter {
         private _id: string
@@ -45,7 +42,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
             this.remoteDescription = null
             this.signalingState = 'stable'
             bridge.on(`pc:${this._id}`, this.onMessage.bind(this))
-            bridge.eval(`
+            bridge.eval(JSON.stringify(this._id), `
         (function () {
           var pc = conns[${JSON.stringify(this._id)}] = new webkitRTCPeerConnection(${JSON.stringify(opts)})
           pc.dataChannels = {}
@@ -328,7 +325,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
                     _resolve(res.res)
                 }
             })
-            bridge.eval(`
+            bridge.eval(JSON.stringify(this._id),`
         (function () {
           var id = ${JSON.stringify(this._id)}
           var reqId = ${JSON.stringify(reqId)}
