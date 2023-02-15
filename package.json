@@ -8,7 +8,7 @@
     "testfix": "tap test/*.js -t150 -Rspec --cov",
     "test": "tap test/*.js -t150 -Rspec --cov",
     "test-tap": "tap test/*.js -Rtap",
-    "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info",
+    "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info"
   },
   "engines": {
     "node": ">=12"
