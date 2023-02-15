@@ -3,13 +3,14 @@
   "version": "0.2.0",
   "description": "Use WebRTC in Electron Main Process, compatible with WebTorrent",
   "main": "index.js",
+  "private": false,
   "scripts": {
     "build": "tsc",
     "testfix": "tap test/*.js -t150 -Rspec --cov",
     "test": "tap test/*.js -t150 -Rspec --cov",
     "test-tap": "tap test/*.js -Rtap",
     "test-lcov": "mkdir -p coverage && tap test/*.js -Rsilent --coverage-report=text-lcov > coverage/lcov.info",
-    "publish": "tsc && npm publish --access public ."
+    "publish": "tsc && npm publish --access=public"
   },
   "engines": {
     "node": ">=12"
