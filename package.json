@@ -1,5 +1,5 @@
 {
-  "name": "@ca9io/electron-webrtc-relay",
+  "name": "@constl/electron-webrtc-relay",
   "version": "0.2.0",
   "description": "Use WebRTC in Electron Main Process, compatible with WebTorrent",
   "main": "index.js",
