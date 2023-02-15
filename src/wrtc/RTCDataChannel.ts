@@ -216,6 +216,8 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
             this._binaryType = value
             this._setProp('binaryType', value)
         }
+        
+        addEventListener = this.addListener
     }
 }
 
