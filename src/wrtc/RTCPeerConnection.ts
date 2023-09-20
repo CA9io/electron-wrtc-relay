@@ -274,7 +274,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
 
         close() {
             this._eval(`
-        if (pc.signalingState !== 'closed') pc.close()
+        if (pc && pc.signalingState !== 'closed') pc.close()
         pc = null
       `)
         }
