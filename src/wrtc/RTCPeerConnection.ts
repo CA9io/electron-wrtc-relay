@@ -274,7 +274,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
 
         close() {
             this._eval(`
-        if (pc.signalingState !== 'closed') pc.close()
+        if (pc && pc.signalingState !== 'closed') pc.close()
         pc = null
       `)
         }
@@ -347,5 +347,7 @@ module.exports = function (bridge: BRIDGE, wrtc: EventEmitter) {
         _callRemote(name: string, args?: any, cb?: any, errCb?: any) {
             return this._eval(`pc.${name}(${args || ''})`, cb, errCb)
         }
+        
+        addEventListener = this.addListener
     }
 }

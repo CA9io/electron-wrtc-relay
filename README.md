@@ -16,6 +16,11 @@
     <a href="https://merch.ca9.io"><img src="https://img.shields.io/badge/merch-support_us-red.svg?style=flat&logo=Spreadshirt"></a>
 </p>
 
+<hr/>
+
+**Modifications mineurs par Julien Malard-Adam au [projet original](https://github.com/CA9io/electron-wrtc-relay). Code modifié disponible [ici](https://github.com/julienmalard/electron-wrtc-relay).**
+<hr/>
+
 Use **WebRTC** in the **Main Process** in your **Electron** project.
 
 WebRTC is a powerful web API that lets browsers make peer-to-peer connections, and has already been
